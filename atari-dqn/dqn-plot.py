@@ -37,5 +37,6 @@ def plot_learning_curve(log_dir, smooth_window=10):
     plt.show()
 
 if __name__ == "__main__":
-    log_dir = "runs/BreakoutNoFrameskip-v4__dqn_atari__1__1714053325/events.out.tfevents.1714053325.DESKTOP-QG4VMUB.18052.0"  # Change this to the directory where your TensorBoard logs are stored
+    log_dir = "atari-dqn/runs/BreakoutNoFrameskip-v4__dqn_atari__1__1715761319/events.out.tfevents.1715761319.DESKTOP-QG4VMUB.16816.0"  # Change this to the directory where your TensorBoard logs are stored
     plot_learning_curve(log_dir)
+
