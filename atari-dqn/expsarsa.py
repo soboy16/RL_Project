@@ -172,8 +172,8 @@ if __name__ == "__main__":
 
     q_network = QNetwork(envs).to(device)
     optimizer = optim.Adam(q_network.parameters(), lr=args.learning_rate)
-    target_network = QNetwork(envs).to(device)
-    target_network.load_state_dict(q_network.state_dict())
+   # target_network = QNetwork(envs).to(device)
+   # target_network.load_state_dict(q_network.state_dict())
 
     rb = ReplayBuffer(
         args.buffer_size,
@@ -216,10 +216,10 @@ if __name__ == "__main__":
             if global_step % args.train_frequency == 0:
                 data = rb.sample(args.batch_size)
                 with torch.no_grad():
-                    next_q_values = target_network(data.next_observations)
-                    next_q_values_policy = q_network(data.next_observations)
+                    #next_q_values = target_network(data.next_observations)
+                    next_q_values = q_network(data.next_observations)
                     next_probabilities = torch.full(next_q_values.shape, epsilon / next_q_values.shape[1], device=device)
-                    next_probabilities.scatter_(1, next_q_values_policy.argmax(dim=1, keepdim=True), 1 - epsilon + (epsilon / next_q_values.shape[1]))
+                    next_probabilities.scatter_(1, next_q_values.argmax(dim=1, keepdim=True), 1 - epsilon + (epsilon / next_q_values.shape[1]))
                     expected_next_q = (next_q_values * next_probabilities).sum(dim=1)
                     td_target = data.rewards.flatten() + args.gamma * expected_next_q * (1 - data.dones.flatten())
                 old_val = q_network(data.observations).gather(1, data.actions).squeeze()
@@ -235,11 +235,11 @@ if __name__ == "__main__":
                 loss.backward()
                 optimizer.step()
 
-            if global_step % args.target_network_frequency == 0:
-                for target_network_param, q_network_param in zip(target_network.parameters(), q_network.parameters()):
-                    target_network_param.data.copy_(
-                        args.tau * q_network_param.data + (1.0 - args.tau) * target_network_param.data
-                    )
+            #if global_step % args.target_network_frequency == 0:
+            #    for target_network_param, q_network_param in zip(target_network.parameters(), q_network.parameters()):
+            #        target_network_param.data.copy_(
+            #            args.tau * q_network_param.data + (1.0 - args.tau) * target_network_param.data
+            #        )
 
     if args.save_model:
         model_path = f"runs/{run_name}/{args.exp_name}.pth"
